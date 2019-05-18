@@ -32,7 +32,7 @@ instance.prototype.incomingData = function(data) {
 	// Match part of the copyright response from unit when a connection is made.
 	if (self.login === false && data.match("Extron Electronics")) {
 		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write("I"+ "\n");
+		self.socket.write("1I"+ "\n");
 	}
 
 	if (self.login === false && data.match("Password:")) {
@@ -41,7 +41,7 @@ instance.prototype.incomingData = function(data) {
 	}
 
 	// Match first letter of expected response from unit.
-	else if (self.login === false && data.match("V")) {
+	else if (self.login === false && data.match("IPL T PCS4")) {
 		self.login = true;
 		self.status(self.STATUS_OK);
 		debug("logged in");
