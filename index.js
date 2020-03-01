@@ -30,25 +30,21 @@ instance.prototype.incomingData = function(data) {
 	debug(data);
 
 	// Match part of the copyright response from unit when a connection is made.
-	if (self.login === false && data.match("Extron Electronics")) {
+	if (self.login === false && data.match(/Extron Electronics/)) {
 		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write("1I"+ "\n");
+		self.socket.write("1I\n");
 	}
 
-	if (self.login === false && data.match("Password:")) {
+	if (self.login === false && data.match(/Password:/)) {
 		self.status(self.STATUS_WARNING,'Logging in');
-		self.socket.write(""+ "\n");
+		self.socket.write("\n");
 	}
 
 	// Match first letter of expected response from unit.
-	else if (self.login === false && data.match("IPL T PCS4")) {
+	else if (self.login === false && data.match(/IPL T PCS4/)) {
 		self.login = true;
 		self.status(self.STATUS_OK);
 		debug("logged in");
-	}
-	else if (self.login === false && data.match('login incorrect')) {
-		self.log('error', "incorrect username/password (expected no password)");
-		self.status(self.STATUS_ERROR, 'Incorrect user/pass');
 	}
 	else {
 		debug("data nologin", data);
@@ -66,7 +62,6 @@ instance.prototype.init = function() {
 
 instance.prototype.init_tcp = function() {
 	var self = this;
-	var receivebuffer = '';
 
 	if (self.socket !== undefined) {
 		self.socket.destroy();
@@ -86,16 +81,11 @@ instance.prototype.init_tcp = function() {
 		self.socket.on('error', function (err) {
 			debug("Network error", err);
 			self.log('error',"Network error: " + err.message);
+			self.login = false;
 		});
 
 		self.socket.on('connect', function () {
 			debug("Connected");
-			self.login = false;
-		});
-
-		self.socket.on('error', function (err) {
-			debug("Network error", err);
-			self.log('error',"Network error: " + err.message);
 			self.login = false;
 		});
 
@@ -108,12 +98,12 @@ instance.prototype.init_tcp = function() {
 		self.socket.on("iac", function(type, info) {
 			// tell remote we WONT do anything we're asked to DO
 			if (type == 'DO') {
-				socket.write(new Buffer([ 255, 252, info ]));
+				self.socket.write(new Buffer([ 255, 252, info ]));
 			}
 
 			// tell the remote DONT do whatever they WILL offer
 			if (type == 'WILL') {
-				socket.write(new Buffer([ 255, 254, info ]));
+				self.socket.write(new Buffer([ 255, 254, info ]));
 			}
 		});
 	}
@@ -202,13 +192,6 @@ instance.prototype.action = function(action) {
 			cmd = "\x1B"+opt.receptacle+"*0PC";
 			break;
 
-	}
-
-	if (cmd !== undefined) {
-			if (self.tcp !== undefined) {
-					debug('sending ', cmd, "to", self.tcp.host);
-					self.tcp.send(cmd);
-			}
 	}
 
 	if (cmd !== undefined) {
