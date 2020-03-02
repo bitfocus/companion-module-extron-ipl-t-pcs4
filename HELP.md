@@ -1,6 +1,6 @@
-# Module for Extron extron-ipl-t-pcs4
+# Module for Extron IPL-T-PCS4
 
-> this module connects via a telnet connection.
+> This module connects via a telnet connection.
 
 ## Extra Information
 
@@ -9,4 +9,4 @@
 
 ## Supported commands
 
-* **Receptacle on/off** Switch the outleds
+* **Receptacle on/off** Switch the outlets
